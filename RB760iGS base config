@@ -1,0 +1,105 @@
+#1 Перепрошивка
+
+Подключить компьютер к первому (ether1) порту маршрутизатора.  
+Запустить Netinstall от имени администратора. Нажать [Net booting], поставить галочку и прописать IP-адрес из той же подсети что и на компьютере.  
+Зажать Reset на маршрутизаторе и подключить питание. Отпустить Reset когда в Netinstall появится маршрутизатор.  
+В Netinstall выбрать пакеты для установки. Нажать Install.  
+
+#2 Обновление Firmware и сброс настроек по умолчанию.
+
+Запустить WinBox, подключиться по MAC-адресу.  
+System -> Routerboard ->[Upgrade]; System ->Reboot -> YES.  
+System -> Reset Configuration: {No Default Configuration, Do Not Backup} -> [Reset Configuration]; System -> Reboot -> YES.  
+
+**********
+#2 CLI-version
+
+/system routerboard upgrade  
+/system reboot  
+
+/system package update set channel=long-term  
+/system package update check-for-updates  
+/system package update install  
+/system reboot  
+
+/system reset-configuration no-defaults=yes skip-backup=yes  
+/system reboot  
+**********
+
+#3 Идентификация устройства
+
+/system identity print  
+/system identity set name=Cisco7200  
+
+#4 Пользователи и группы
+
+/user print  
+/user add name=sup3rus3r group=full password=w0rdp4ss comment="Full Access"  
+/quit
+
+!!!Зайти в систему под учётной записью нового пользователя и удалить учётную запись admin
+
+/user print  
+/user remove admin  
+
+#5 Настройка WAN
+
+/interface bridge add name=Bridge-WAN  
+/interface bridge port add bridge=Bridge-WAN interface=ether1  
+/interface list add name=WAN  
+/interface list member add interface=Bridge-WAN list=WAN  
+
+/ip address print  
+/ip address add address=203.0.113.153/28 interface=ether1 comment="ISP#1"  
+
+/ip route print  
+/ip route add dst-address=0.0.0.0/0 gateway=203.0.113.144 comment="Default route"  
+
+#6 Настройка LAN
+
+/interface bridge add name=Bridge-LAN  
+/interface bridge port add bridge=Bridge-LAN interface=ether2  
+/interface bridge port add bridge=Bridge-LAN interface=ether3  
+/interface bridge port add bridge=Bridge-LAN interface=ether4  
+/interface bridge port add bridge=Bridge-LAN interface=ether5  
+/interface list add name=LAN  
+/interface list member add interface=Bridge-LAN list=LAN  
+
+/ip address add address=192.168.113.1/24 interface=Bridge-LAN comment="LAN"
+
+#7 Настройка DNS (НСДИ)
+
+/ip dns set servers=195.208.4.1,195.208.5.1  
+
+!!! IPv6 DNS: /ip dns set servers=2a0c:a9c7:9::1,2a0c:a9c7:8::1
+
+/ip dns cache flush  
+/ip dns set allow-remote-requests=yes  
+
+!!! Заворот DNS-запросов на МТ. Прописав другие DNS на локальном компьютере, запросы всё равно будут идти через MT.
+
+/ip firewall nat add action=redirect chain=dstnat protocol=udp dst-port=53  
+/ip firewall nat add action=redirect chain=dstnat protocol=tcp dst-port=53  
+
+#8 Настройка DHCP-сервера
+
+/ip pool add name=DHCP-Pool-LAN ranges=192.168.113.51-192.168.113.100  
+/ip dhcp-server add address-pool=DHCP-Pool-LAN disabled=no interface=Bridge-LAN lease-time=180d name=DHCP-SRV-LAN
+/ip dhcp-server network add address=192.168.113.0/24 dns-server=192.168.113.1 gateway=192.168.113.1 netmask=24 wins-server=192.168.113.1
+
+#9 Отключение сервисов доступа
+
+/ip service print  
+/ip service set www-ssl tls-version=only-1.2  
+/ip service set api-ssl tls-version=only-1.2  
+/ip service disable 0,1,2,4,5,7  
+/ip service set ssh port=2222  
+/ip service set winbox address=192.168.113.0/24  
+
+#10 Перенастройка SSH
+
+/ip ssh print  
+/ip ssh set strong-crypto=yes  
+/ip ssh set host-key-size=8192  
+/ip ssh regenerate-host-key  
+y  
