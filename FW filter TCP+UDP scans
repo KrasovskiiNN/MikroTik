@@ -1,0 +1,18 @@
+/ip firewall filter
+add action=jump chain=WAN_INPUT comment="Invalid TCP" jump-target=invalid_tcp protocol=tcp
+add action=jump chain=LAN_INPUT comment="Invalid TCP" jump-target=invalid_tcp protocol=tcp
+add action=jump chain=forward comment="Invalid TCP" jump-target=invalid_tcp protocol=tcp
+
+add action=drop chain=invalid_tcp comment="Invalid TCP - !(FIN/SYN/RST/ACK)" protocol=tcp tcp-flags=!fin,!syn,!rst,!ack
+add action=drop chain=invalid_tcp comment="Invalid TCP - FIN/SYN" protocol=tcp tcp-flags=fin,syn
+add action=drop chain=invalid_tcp comment="Invalid TCP - FIN/RST" protocol=tcp tcp-flags=fin,rst
+add action=drop chain=invalid_tcp comment="Invalid TCP - FIN/!ACK" protocol=tcp tcp-flags=fin,!ack
+add action=drop chain=invalid_tcp comment="Invalid TCP - FIN/URG" protocol=tcp tcp-flags=fin,urg
+add action=drop chain=invalid_tcp comment="Invalid TCP - SYN/RST" protocol=tcp tcp-flags=syn,rst
+add action=drop chain=invalid_tcp comment="Invalid TCP - RST/URG" protocol=tcp tcp-flags=rst,urg
+
+add action=drop chain=invalid_tcp comment="Invalid TCP - Source Port 0" protocol=tcp src-port=0
+add action=drop chain=invalid_tcp comment="Invalid TCP - Destination Port 0" dst-port=0 protocol=tcp
+
+add action=drop chain=invalid_udp comment="Invalid UDP - Source Port 0" protocol=udp src-port=0
+add action=drop chain=invalid_udp comment="Invalid UDP - Destination Port 0" dst-port=0 protocol=udp
