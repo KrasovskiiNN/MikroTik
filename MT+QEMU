@@ -1,5 +1,5 @@
 1) Скачать с https://www.qemu.org/download/#windows последнюю версию QEMU  
-	qemu-w64-setup-20221230.exe  
+	qemu-w64-setup-20230424.exe  
 
 2) Скачать c https://mikrotik.com/download последнюю версию Cloud Hosted Router Long-term Raw disk image  
 	chr-6.48.6.img.zip  
@@ -7,7 +7,7 @@
 	dude-6.48.6.npk  
 
 3) Скачать https://openvpn.net/community-downloads/  
-	OpenVPN-2.6.0-I005-amd64.msi  
+	OpenVPN-2.6.3-I003-amd64.msi  
 
 4) Установить TAP-драйвер  
 5) OpenVPN TAP-Windows6 переименовать в TAP  
@@ -30,4 +30,4 @@ qemu-system-x86_64w.exe -hda chr-6.48.6.qcow2 -net nic -net tap,ifname=TAP -m 28
 
 7) Добавить все пакеты через WinBox
 
-Аналогично делается для RouterOS 7.8
+Аналогично делается для RouterOS 7.9
