@@ -6,7 +6,7 @@
 	all_packages-x86-6.49.10.zip  
 	
 3) Скачать https://openvpn.net/community-downloads/  
-	OpenVPN-2.6.8-I001-amd64.msi  
+	OpenVPN-2.6.9-I001-amd64.msi  
 
 4) Установить TAP-драйвер  
 5) OpenVPN TAP-Windows6 переименовать в TAP  
@@ -29,4 +29,4 @@ qemu-system-x86_64w.exe -hda chr-6.49.10.qcow2 -net nic -net tap,ifname=TAP -m 2
 
 7) Добавить все пакеты через WinBox 3.40
 
-Аналогично делается для RouterOS 7.13.3
+Аналогично делается для RouterOS 7.13.4
